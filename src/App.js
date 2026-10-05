@@ -1,25 +1,38 @@
-import logo from './logo.svg';
 import './App.css';
+import { useState, useEffect } from "react";
+import fetchUserProfile from "./ReactComp";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [count, setCount] = useState(0);
+    const [error, setError] = useState("");
+
+    const incrementCount = () => {
+        setCount((prev) => prev + 1);
+    };
+
+    const fetchUser = async () => {
+        try {
+            const resp = await fetchUserProfile("1");
+            setCount(Number(resp.accountBalance));
+        } catch (err) {
+            setError(err instanceof Error ? err.message : String(err));
+        }
+    };
+
+    useEffect(() => {
+        fetchUser();
+        return () => {
+            console.log("unmount");
+        };
+    }, []);
+
+    return (
+        <div className="app">
+            <h1>Account Balance: {count}</h1>
+            {error ? <p>{error}</p> : null}
+            <button onClick={incrementCount}>Increment Count</button>
+        </div>
+    );
 }
 
 export default App;
